@@ -2,7 +2,7 @@ import argparse
 import time
 import torch
 from Models import get_model
-from Process import *
+from Process import read_data, create_dataset, create_fields
 import torch.nn.functional as F
 from Optim import CosineWithRestarts
 from Batch import create_masks
@@ -73,7 +73,7 @@ def main():
     parser.add_argument('-trg_lang', required=True)
     parser.add_argument('-no_cuda', action='store_true')
     parser.add_argument('-SGDR', action='store_true')
-    parser.add_argument('-epochs', type=int, default=2)
+    parser.add_argument('-epochs', type=int, default=10)
     parser.add_argument('-d_model', type=int, default=512)
     parser.add_argument('-n_layers', type=int, default=6)
     parser.add_argument('-heads', type=int, default=8)
@@ -93,6 +93,7 @@ def main():
     if opt.device == 'cuda':
         assert torch.cuda.is_available()
 
+    # open src and trg paths, readin vocab, split into array - opt.src_data, opt.trg_data
     read_data(opt)
     SRC, TRG = create_fields(opt)
     opt.train = create_dataset(opt, SRC, TRG)
